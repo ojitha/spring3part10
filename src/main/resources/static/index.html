@@ -1,0 +1,67 @@
+<html>
+<head>
+    <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+
+    <link data-require="bootstrap-css@3.3.6" data-semver="3.3.6" rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.css" />
+    <script data-require="angular.js@1.5.3" data-semver="1.5.3" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js"></script>
+
+    <script type="text/javascript">
+        angular.module('ex1',[])
+                .controller('FriendController', ['Friends', function(Friends){
+                    var friendList = this;
+                    Friends.load().success(function(data){
+                        friendList.friends = data;
+                    }).error(function(data, status, headers, config){
+                        if (status === 404) {
+                            window.alert('not found');
+                        } else {
+                            window.alert('Unknown error');
+                        }
+                    });
+                }]);
+    </script>
+
+    <script type="text/javascript">
+        angular.module('ex1')
+                .factory('Friends', function($http){
+                    var friendRequest = null;
+                    return {
+                        load: function(){
+                            if (!friendRequest){
+                                friendRequest = $http.get('/mf/friends');
+                            }
+                            return friendRequest;
+                        }
+                    };
+                });
+    </script>
+
+
+    <style type="text/css">
+        .even {
+            color: red;
+        }
+        .odd {
+            color: blue;
+        }∏
+    </style>
+</head>
+
+<body ng-app="ex1">
+<div ng-controller="FriendController as friendList">
+    <p><input type="text" ng-model="searchFor" size="30"/></p>
+    <ul>
+        <div class="panel panel-primary" ng-repeat="friend in friendList.friends | filter: searchFor"
+             ng-class="{even:$even, odd:$odd}">
+            <div class="panel-heading">{{friend.name}}</div>
+            <ul>
+                <li ng-repeat= "(k, v) in friend">
+                    <strong>{{k}}</strong> = {{v}}
+                </li>
+            </ul>
+        </div>
+    </ul>
+</div>
+</body>
+</html>
